@@ -28,6 +28,7 @@ func main() {
 
 func setupServer() (*http.Server, error) {
 	serverCert, err := tls.LoadX509KeyPair("../certs/server.crt", "../certs/server.key")
+	// serverCert, err := tls.LoadX509KeyPair("../certs/wrong_cn_server.crt", "../certs/wrong_cn_server.key")
 	if err != nil {
 		return nil, err
 	}
