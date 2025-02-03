@@ -15,7 +15,8 @@ func main() {
 		log.Fatalf("could not setup client: %s\n", err)
 	}
 
-	resp, err := client.Get("https://localhost:8443/hello")
+	// resp, err := client.Get("https://localhost:8443/hello")
+	resp, err := client.Get("https://localhost:10000/hello")
 	if err != nil {
 		log.Fatalf("could not send request: %s\n", err)
 	}
