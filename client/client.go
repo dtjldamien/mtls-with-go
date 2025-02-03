@@ -31,7 +31,7 @@ func setupClient() (*http.Client, error) {
 		return nil, err
 	}
 
-	caCert, err := os.ReadFile("../certs/ca.crt")
+	caCert, err := os.ReadFile("../certs/intermediate_ca.crt")
 	if err != nil {
 		return nil, err
 	}
