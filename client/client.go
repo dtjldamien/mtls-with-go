@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -15,10 +18,22 @@ func main() {
 		log.Fatalf("could not setup client: %s\n", err)
 	}
 
-	// resp, err := client.Get("https://localhost:8443/hello")
-	resp, err := client.Get("https://localhost:10000/hello")
+  err = godotenv.Load()
+  if err != nil {
+    log.Fatal("Error loading .env file")
+  }
+	endpointUrl := os.Getenv("ENDPOINT_URL")
+  apiKey := os.Getenv("API_KEY")
+
+	req, err := http.NewRequest("GET", endpointUrl, bytes.NewBuffer(nil))
 	if err != nil {
-		log.Fatalf("could not send request: %s\n", err)
+		log.Fatalf("could not form request: %s\n", err)
+	}
+
+	req.Header.Set("api-token", apiKey)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("error sending request: %s\n", err)
 	}
 	defer resp.Body.Close()
 

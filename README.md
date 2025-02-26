@@ -17,11 +17,20 @@ chmod +x generate_certs.sh
 Run the server:
 
 ```bash
+cd server
 go run server.go
+```
+
+Run Envoy proxy:
+
+```bash
+cd envoy
+envoy -c envoy-demo.yaml
 ```
 
 Run the client:
 
 ```bash
+cd client
 go run client.go
 ```

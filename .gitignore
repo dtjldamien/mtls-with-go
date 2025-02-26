@@ -3,4 +3,5 @@
 *.key
 *.srl
 
+.env
 .DS_Store
