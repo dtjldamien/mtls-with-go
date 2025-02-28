@@ -36,10 +36,8 @@ static_resources:
               validation_context:
                 trusted_ca:
                   filename: "../certs/intermediate_ca.crt"
-                # match_typed_subject_alt_names:
-                # - san_type: DNS
-                #   matcher:
-                #     exact: client
+                crl:
+                  filename: "../certs/crl.pem"
               tls_certificates:
               - certificate_chain:
                   filename: "../certs/server.crt"

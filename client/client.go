@@ -42,7 +42,8 @@ func main() {
 }
 
 func setupClient() (*http.Client, error) {
-	clientCert, err := tls.LoadX509KeyPair("../certs/client.crt", "../certs/client.key")
+	// clientCert, err := tls.LoadX509KeyPair("../certs/client.crt", "../certs/client.key")
+	clientCert, err := tls.LoadX509KeyPair("../certs/revoked_client.crt", "../certs/revoked_client.key")
 	// clientCert, err := tls.LoadX509KeyPair("../certs/rogue_client.crt", "../certs/rogue_client.key")
 
 	if err != nil {

@@ -2,6 +2,13 @@
 *.crt
 *.key
 *.srl
+*.old
+*.attr
+*.txt
+*.pem
+
+crlnumber
+serial
 
 .env
 .DS_Store

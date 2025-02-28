@@ -1,0 +1,15 @@
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir               = .
+database          = $dir/index.txt
+serial           = $dir/serial
+crlnumber        = $dir/crlnumber
+private_key      = $dir/intermediate_ca.key
+certificate      = $dir/intermediate_ca.crt
+default_days     = 365
+default_md       = sha256
+policy          = policy_match
+x509_extensions = usr_cert
+crl_extensions  = crl_ext
