@@ -15,6 +15,16 @@ func main() {
 		log.Fatalf("could not setup server: %s\n", err)
 	}
 
+	http.HandleFunc("/crl.pem", func(w http.ResponseWriter, r *http.Request) {
+		crl, err := os.ReadFile("../certs/crl.pem")
+		if err != nil {
+				http.Error(w, "Could not read CRL", http.StatusInternalServerError)
+				return
+		}
+		w.Header().Set("Content-Type", "application/x-pem-file")
+		w.Write(crl)
+})
+
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "hello!")
 	})
@@ -47,7 +57,7 @@ func setupServer() (*http.Server, error) {
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{serverCert},
 		ClientCAs:    caCertPool,
-		ClientAuth:   tls.RequireAndVerifyClientCert,
+		// ClientAuth:   tls.RequireAndVerifyClientCert,
 	}
 
 	server := &http.Server{
