@@ -35,14 +35,15 @@ static_resources:
             common_tls_context:
               validation_context:
                 trusted_ca:
-                  filename: "../certs/intermediate_ca.crt"
+                  filename: "../certs/ca_chain.crt"
                 crl:
                   filename: "../certs/crl.pem"
+                only_verify_leaf_cert_crl: true
               tls_certificates:
               - certificate_chain:
-                  filename: "../certs/server.crt"
+                  filename: "../certs/envoy.crt"
                 private_key:
-                  filename: "../certs/server.key"
+                  filename: "../certs/envoy.key"
 
   clusters:
   - name: service_envoyproxy_io
@@ -65,6 +66,6 @@ static_resources:
         common_tls_context:
           tls_certificates:
           - certificate_chain:
-              filename: "../certs/client.crt"
+              filename: "../certs/envoy.crt"
             private_key:
-              filename: "../certs/client.key"
+              filename: "../certs/envoy.key"
