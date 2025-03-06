@@ -16,12 +16,14 @@ func main() {
 	}
 
 	http.HandleFunc("/crl.pem", func(w http.ResponseWriter, r *http.Request) {
-		crl, err := os.ReadFile("../certs/crl.pem")
+		crl, err := os.ReadFile("../certs/crl_intermediate_two.pem")
+		// crl, err := os.ReadFile("../certs/crl.pem")
+
 		if err != nil {
 				http.Error(w, "Could not read CRL", http.StatusInternalServerError)
 				return
 		}
-		w.Header().Set("Content-Type", "application/x-pem-file")
+		w.Header().Set("Content-Type", "text-plain")
 		w.Write(crl)
 })
 
