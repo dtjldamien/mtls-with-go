@@ -72,6 +72,7 @@ openssl req -new -key rogue_client.key -out rogue_client.csr -subj "/C=US/ST=Cal
 openssl ca -batch -config openssl.cnf -keyfile intermediate_rogue_ca.key -cert intermediate_rogue_ca.crt -in rogue_client.csr -out rogue_client.crt -days 365 -extensions usr_cert -notext
 
 echo "Verifying certificates against CRL"
+openssl verify -CAfile ca_chain.crt -crl_check -CRLfile crl.pem server.crt
 openssl verify -CAfile ca_chain.crt -crl_check -CRLfile crl.pem valid_client_one.crt
 openssl verify -CAfile ca_chain.crt -crl_check -CRLfile crl.pem valid_client_two.crt
 openssl verify -CAfile ca_chain.crt -crl_check -CRLfile crl.pem revoked_client_one.crt
