@@ -14,22 +14,22 @@ echo '01' > crlnumber
 
 echo "Generating CAs"
 openssl genrsa -out root_ca.key 2048
-openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 3650 -out root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_ca"
+openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 30 -out root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_ca"
 
 openssl genrsa -out intermediate_ca_one.key 2048
 openssl req -new -key intermediate_ca_one.key -out intermediate_ca_one.csr -subj "/C=US/ST=California/L=San Francisco/O=Intermediate Corp/CN=intermediate_ca_one" -config openssl.cnf
-openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_one.csr -out intermediate_ca_one.crt -days 3650 -extensions v3_ca -notext
+openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_one.csr -out intermediate_ca_one.crt -days 30 -extensions v3_ca -notext
 
 openssl genrsa -out intermediate_ca_two.key 2048
 openssl req -new -key intermediate_ca_two.key -out intermediate_ca_two.csr -subj "/C=US/ST=California/L=San Francisco/O=Intermediate Corp/CN=intermediate_ca_two" -config openssl.cnf
-openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_two.csr -out intermediate_ca_two.crt -days 3650 -extensions v3_ca -notext
+openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_two.csr -out intermediate_ca_two.crt -days 30 -extensions v3_ca -notext
 
 openssl genrsa -out root_rogue_ca.key 2048
-openssl req -x509 -new -nodes -key root_rogue_ca.key -sha256 -days 3650 -out root_rogue_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_rogue_ca"
+openssl req -x509 -new -nodes -key root_rogue_ca.key -sha256 -days 30 -out root_rogue_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_rogue_ca"
 
 openssl genrsa -out intermediate_rogue_ca.key 2048
 openssl req -new -key intermediate_rogue_ca.key -out intermediate_rogue_ca.csr -subj "/C=US/ST=California/L=San Francisco/O=Intermediate Corp/CN=intermediate_rogue_ca" -config openssl.cnf
-openssl ca -batch -config openssl.cnf -keyfile root_rogue_ca.key -cert root_rogue_ca.crt -in intermediate_rogue_ca.csr -out intermediate_rogue_ca.crt -days 3650 -extensions v3_ca -notext
+openssl ca -batch -config openssl.cnf -keyfile root_rogue_ca.key -cert root_rogue_ca.crt -in intermediate_rogue_ca.csr -out intermediate_rogue_ca.crt -days 30 -extensions v3_ca -notext
 
 # Create CA chain
 cat root_ca.crt intermediate_ca_one.crt intermediate_ca_two.crt > ca_chain.crt
