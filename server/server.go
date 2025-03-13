@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -124,7 +126,19 @@ func main() {
 			return
 		}
 
+		// read from forwarded header if exists
 		clientCert := r.TLS.PeerCertificates[0]
+		xfccHeader := r.Header.Get("x-forwarded-client-cert")
+
+		if xfccHeader != "" {
+			cert, err := parseForwardedCert(xfccHeader)
+			if cert != nil {
+				clientCert = cert
+			} else {
+				log.Printf("errors parsing xfcc cert: %v", err)
+			}
+		}
+
 		log.Printf("Client connected with certificate: %s", clientCert.SerialNumber)
 
 		// check if client cert has been revoked
@@ -170,4 +184,43 @@ func main() {
 	if err != nil {
 		log.Fatalf("server failed to start: %v", err)
 	}
+}
+
+func parseForwardedCert(xfccHeader string) (*x509.Certificate, error) {
+	parts := strings.Split(xfccHeader, ";")
+	var certPEM string
+
+	for _, part := range parts {
+		if strings.HasPrefix(part, "Cert=") {
+			// Remove Cert= prefix and decode URL encoding
+			certPEM = strings.TrimPrefix(part, "Cert=")
+			certPEM = strings.Trim(certPEM, "\"")
+			decoded, err := url.QueryUnescape(certPEM)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode URL-encoded certificate: %v", err)
+			}
+			certPEM = decoded
+			break // Found the certificate part, exit loop
+		}
+	}
+
+	if certPEM == "" {
+		return nil, fmt.Errorf("no certificate found in XFCC header")
+	}
+
+	block, _ := pem.Decode([]byte(certPEM))
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode PEM block")
+	}
+
+	if block.Type != "CERTIFICATE" {
+		return nil, fmt.Errorf("expected CERTIFICATE block, got %s", block.Type)
+	}
+
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse certificate: %v", err)
+	}
+
+	return cert, nil
 }

@@ -27,6 +27,13 @@ static_resources:
                   route:
                     host_rewrite_literal: www.envoyproxy.io
                     cluster: service_envoyproxy_io
+            forward_client_cert_details: APPEND_FORWARD
+            set_current_client_cert_details:
+              subject: true
+              cert: true
+              chain: true
+              dns: true
+              uri: true
         transport_socket:
           name: envoy.transport_sockets.tls
           typed_config:
