@@ -9,9 +9,16 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	serverCert, err := tls.LoadX509KeyPair("../certs/server.crt", "../certs/server.key")
 	// serverCert, err := tls.LoadX509KeyPair("../certs/wrong_cn_server.crt", "../certs/wrong_cn_server.key")
 	if err != nil {
@@ -120,6 +127,7 @@ func main() {
 		clientCert := r.TLS.PeerCertificates[0]
 		log.Printf("Client connected with certificate: %s", clientCert.SerialNumber)
 
+		// check if client cert has been revoked
 		for _, crl := range crls {
 			for _, entry := range crl.RevokedCertificateEntries {
 				if clientCert.SerialNumber.Cmp(entry.SerialNumber) == 0 {
@@ -128,6 +136,30 @@ func main() {
 					return
 				}
 			}
+		}
+
+		// check if client cert has allowed subject CN and SAN
+		allowedCN := os.Getenv("ALLOWED_CN")
+		if clientCert.Subject.CommonName != allowedCN {
+			log.Printf("invalid CN: expected %s, got %s",
+				allowedCN, clientCert.Subject.CommonName)
+			return
+		}
+
+		// Check SANs
+		found := false
+		allowedSAN := os.Getenv("ALLOWED_SAN")
+		for _, san := range clientCert.DNSNames {
+			log.Printf("client cert dns name: %s", san)
+			if san == allowedSAN {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			log.Printf("required SAN %s not found", allowedSAN)
+			return
 		}
 
 		fmt.Fprintf(w, "hello!")
