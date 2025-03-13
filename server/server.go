@@ -130,6 +130,12 @@ func main() {
 		clientCert := r.TLS.PeerCertificates[0]
 		xfccHeader := r.Header.Get("x-forwarded-client-cert")
 
+		for name, values := range r.Header {
+			for _, value := range values {
+				log.Printf("\t%s: %s", name, value)
+			}
+		}
+
 		if xfccHeader != "" {
 			cert, err := parseForwardedCert(xfccHeader)
 			if cert != nil {

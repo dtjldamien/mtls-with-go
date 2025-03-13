@@ -41,11 +41,12 @@ static_resources:
             require_client_certificate: true
             common_tls_context:
               validation_context:
-                trusted_ca:
-                  filename: "../certs/ca_chain.crt"
-                crl:
-                  filename: "../certs/crl.pem"
-                only_verify_leaf_cert_crl: true
+                trust_chain_verification: ACCEPT_UNTRUSTED
+                # trusted_ca:
+                #   filename: "../certs/ca_chain.crt"
+                # crl:
+                #   filename: "../certs/crl.pem"
+                # only_verify_leaf_cert_crl: true
               tls_certificates:
               - certificate_chain:
                   filename: "../certs/envoy.crt"
