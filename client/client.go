@@ -42,7 +42,7 @@ func main() {
 }
 
 func setupClient() (*http.Client, error) {
-	// clientCert, err := tls.LoadX509KeyPair("../certs/valid_client_one.crt", "../certs/valid_client_one.key")
+	clientCert, err := tls.LoadX509KeyPair("../certs/valid_client_one.crt", "../certs/valid_client_one.key")
 	// clientCert, err := tls.LoadX509KeyPair("../certs/valid_client_two.crt", "../certs/valid_client_two.key")
 	// clientCert, err := tls.LoadX509KeyPair("../certs/revoked_client_one.crt", "../certs/revoked_client_one.key")
 	// clientCert, err := tls.LoadX509KeyPair("../certs/revoked_client_two.crt", "../certs/revoked_client_two.key")
@@ -63,7 +63,7 @@ func setupClient() (*http.Client, error) {
 	}
 
 	tlsConfig := &tls.Config{
-		// Certificates:       []tls.Certificate{clientCert},
+		Certificates:       []tls.Certificate{clientCert},
 		RootCAs:            caCertPool,
 		InsecureSkipVerify: false,
 	}
