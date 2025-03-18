@@ -14,11 +14,11 @@ echo '01' > crlnumber
 
 echo "Generating CAs"
 openssl genrsa -out root_ca.key 2048
-openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 30 -out root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_ca"
+openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 365 -out root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_ca"
 
 openssl genrsa -out intermediate_ca_one.key 2048
 openssl req -new -key intermediate_ca_one.key -out intermediate_ca_one.csr -subj "/C=US/ST=California/L=San Francisco/O=Intermediate Corp/CN=intermediate_ca_one" -config openssl.cnf
-openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_one.csr -out intermediate_ca_one.crt -days 30 -extensions v3_ca -notext
+openssl ca -batch -config openssl.cnf -keyfile root_ca.key -cert root_ca.crt -in intermediate_ca_one.csr -out intermediate_ca_one.crt -days 90 -extensions v3_ca -notext
 
 openssl genrsa -out intermediate_ca_two.key 2048
 openssl req -new -key intermediate_ca_two.key -out intermediate_ca_two.csr -subj "/C=US/ST=California/L=San Francisco/O=Intermediate Corp/CN=intermediate_ca_two" -config openssl.cnf
