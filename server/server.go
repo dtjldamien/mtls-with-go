@@ -187,6 +187,7 @@ func main() {
 }
 
 func parseForwardedCert(xfccHeader string) (*x509.Certificate, error) {
+	log.Println("xfcc header: %s", xfccHeader)
 	firstXfcc := strings.Split(xfccHeader, ",")[0]
 	parts := strings.Split(firstXfcc, ";")
 
