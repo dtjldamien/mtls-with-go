@@ -130,13 +130,16 @@ func main() {
 		clientCert := r.TLS.PeerCertificates[0]
 		xfccHeader := r.Header.Get("x-forwarded-client-cert")
 
-		if xfccHeader != "" {
-			cert, err := parseForwardedCert(xfccHeader)
-			if cert != nil {
-				clientCert = cert
-			} else {
-				log.Printf("errors parsing xfcc cert: %v", err)
-			}
+		if xfccHeader == "" {
+			log.Printf("no xfcc header")
+			return
+		}
+
+		cert, err := parseForwardedCert(xfccHeader)
+		if cert != nil {
+			clientCert = cert
+		} else {
+			log.Printf("errors parsing xfcc cert: %v", err)
 		}
 
 		log.Printf("Client connected with certificate: %s", clientCert.SerialNumber)
@@ -176,7 +179,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprintf(w, "hello!")
+		fmt.Print(xfccHeader)
 	})
 
 	log.Println("Starting server on https://localhost:8443")
@@ -187,8 +190,8 @@ func main() {
 }
 
 func parseForwardedCert(xfccHeader string) (*x509.Certificate, error) {
-	log.Println("xfcc header: %s", xfccHeader)
-	firstXfcc := strings.Split(xfccHeader, ",")[0]
+	xfccParts := strings.Split(xfccHeader, ",")
+	firstXfcc := xfccParts[len(xfccParts)- 1]
 	parts := strings.Split(firstXfcc, ";")
 
 	var certPEM string

@@ -27,7 +27,7 @@ static_resources:
                   route:
                     host_rewrite_literal: www.envoyproxy.io
                     cluster: service_envoyproxy_io
-            forward_client_cert_details: APPEND_FORWARD
+            forward_client_cert_details: SANITIZE_SET
             set_current_client_cert_details:
               cert: true
         transport_socket:

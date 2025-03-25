@@ -13,3 +13,5 @@ stdout
 
 .env
 .DS_Store
+
+/certs_copy
