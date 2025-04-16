@@ -127,8 +127,9 @@ func main() {
 		}
 
 		// read from forwarded header if exists
-		clientCert := r.TLS.PeerCertificates[0]
 		xfccHeader := r.Header.Get("x-forwarded-client-cert")
+		// xfccHeader := "Hash=8a503e0745a67ccdc1f5fb0080386488789a0dae08bde585c213ef8ecb17650f;Cert=\"-----BEGIN%20CERTIFICATE-----%0AMIID2TCCAsGgAwIBAgIBCDANBgkqhkiG9w0BAQsFADBcMQswCQYDVQQGEwJVUzET%0AMBEGA1UECAwKQ2FsaWZvcm5pYTEaMBgGA1UECgwRSW50ZXJtZWRpYXRlIENvcnAx%0AHDAaBgNVBAMME2ludGVybWVkaWF0ZV9jYV9vbmUwHhcNMjUwNDAxMTMzNzQxWhcN%0AMjYwNDAxMTMzNzQxWjBTMQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5p%0AYTEUMBIGA1UECgwLQ2xpZW50IENvcnAxGTAXBgNVBAMMEHZhbGlkX2NsaWVudF9v%0AbmUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDdQF%2F2cxhQtAT2zPyr%0AG%2FdrreWbQtRi2OklZC8BzkjRmw3IlyWZ9Y0JHK4drDfQnIKjzO4TljFPCkVC6zw%2F%0A%2FJ3f3hOwky%2BhIfb0XNbVffaVx5imPEkFvVxweuUi4aFI502rq5HNNoC4L0rNoll2%0A8Pu905LdVhzIECQ3ojiMjUNFzArsBM%2BYZWP7uxSHgJekJ32559db1r%2FHkP7Haho4%0Ay1AClQtwuLk2QRPWFixHE5JEc2eEnOz2eMec2UNE6yDlJi1G%2BbBEvf4MpHKO5NSy%0AHfJ3bUVQr8qO1VBsbZT%2BY9zdHwxrgr2Jgb%2FIropMyjyukrnCfQBgMhmXD6eIUCXz%0ApYStAgMBAAGjga4wgaswCQYDVR0TBAIwADALBgNVHQ8EBAMCBaAwHQYDVR0lBBYw%0AFAYIKwYBBQUHAwEGCCsGAQUFBwMCMB0GA1UdDgQWBBSpRQKF0cn4zomgl%2FonzNJy%0Axcns0TAfBgNVHSMEGDAWgBS0e8dqaXaXbmC6%2BHKwpU4A1TpZGTAyBgNVHREEKzAp%0Agglsb2NhbGhvc3SCFmFwaS5pZGVhLWxpZmVzdHlsZS5uZXSHBH8AAAEwDQYJKoZI%0AhvcNAQELBQADggEBALKoWdY2UV64pX2M6OYtkzGlC74TwrQkLS%2B3FdYQPwvH77dU%0AN0CyMysKVownS1vvJD4aef5KH8OsHK9vvQVhgy%2FtO4xtul26jdpG48B6dkyq8WH6%0AnD3JNtbRaNpj4HYE3rYpRUEvax15krc8oz8Txd8G8oKiXP4EHCpirTBu5xSO%2FvtK%0AcIwq1N1x20jiUxgWtbzmNsqPdgPk%2BmqH3kD5lWTEdawUW%2F1vqZn6vfK%2FsmkB1xO8%0ADgXQrWRBKoglTreNlpofrwzHjDA7Ub%2FoNxbnmBgPKE91pP0m%2FcSclGzs3Nu2RMiF%0APoHJbn8kI8Q0atqcQ9uaRjvwV3lObLqEAAot%2FjE%3D%0A-----END%20CERTIFICATE-----%0A\""
+		log.Printf("xfcc header: %s", xfccHeader)
 
 		if xfccHeader == "" {
 			log.Printf("no xfcc header")
@@ -136,19 +137,17 @@ func main() {
 		}
 
 		cert, err := parseForwardedCert(xfccHeader)
-		if cert != nil {
-			clientCert = cert
-		} else {
+		if err != nil {
 			log.Printf("errors parsing xfcc cert: %v", err)
 		}
 
-		log.Printf("Client connected with certificate: %s", clientCert.SerialNumber)
+		log.Printf("Client connected with certificate: %s", cert.SerialNumber)
 
 		// check if client cert has been revoked
 		for _, crl := range crls {
 			for _, entry := range crl.RevokedCertificateEntries {
-				if clientCert.SerialNumber.Cmp(entry.SerialNumber) == 0 {
-					log.Printf("Rejected revoked certificate: %s", clientCert.SerialNumber)
+				if cert.SerialNumber.Cmp(entry.SerialNumber) == 0 {
+					log.Printf("Rejected revoked certificate: %s", cert.SerialNumber)
 					http.Error(w, "Certificate has been revoked", http.StatusUnauthorized)
 					return
 				}
@@ -157,16 +156,16 @@ func main() {
 
 		// check if client cert has allowed subject CN and SAN
 		allowedCN := os.Getenv("ALLOWED_CN")
-		if clientCert.Subject.CommonName != allowedCN {
+		if cert.Subject.CommonName != allowedCN {
 			log.Printf("invalid CN: expected %s, got %s",
-				allowedCN, clientCert.Subject.CommonName)
+				allowedCN, cert.Subject.CommonName)
 			return
 		}
 
 		// Check SANs
 		found := false
 		allowedSAN := os.Getenv("ALLOWED_SAN")
-		for _, san := range clientCert.DNSNames {
+		for _, san := range cert.DNSNames {
 			log.Printf("client cert dns name: %s", san)
 			if san == allowedSAN {
 				found = true

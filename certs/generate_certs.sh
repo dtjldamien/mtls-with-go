@@ -14,8 +14,12 @@ echo '01' > crlnumber
 
 echo "Generating CAs"
 openssl genrsa -out root_ca.key 2048
-faketime 'last week' openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 1 -out expired_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=expired_root_ca"
-faketime 'next week' openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 1 -out future_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Future Corp/CN=future_root_ca"
+
+CURRENT_TIME="2025-04-16 07:55:18"
+faketime "$CURRENT_TIME" openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 1 -out expired_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=expired_root_ca"
+faketime "$CURRENT_TIME" openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 1 -out one_day_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Future Corp/CN=one_day_root_ca"
+faketime "$CURRENT_TIME" openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 7 -out seven_day_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Future Corp/CN=seven_day_root_ca"
+faketime "$CURRENT_TIME" openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 14 -out fourteen_day_root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Future Corp/CN=fourteen_day_root_ca"
 openssl req -x509 -new -nodes -key root_ca.key -sha256 -days 365 -out root_ca.crt -subj "/C=US/ST=California/L=San Francisco/O=Root Corp/CN=root_ca"
 
 openssl genrsa -out intermediate_ca_one.key 2048
