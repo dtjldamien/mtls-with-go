@@ -18,12 +18,12 @@ func main() {
 		log.Fatalf("could not setup client: %s\n", err)
 	}
 
-  err = godotenv.Load()
-  if err != nil {
-    log.Fatal("Error loading .env file")
-  }
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	endpointUrl := os.Getenv("ENDPOINT_URL")
-  apiKey := os.Getenv("API_KEY")
+	apiKey := os.Getenv("API_KEY")
 
 	req, err := http.NewRequest("GET", endpointUrl, bytes.NewBuffer(nil))
 	if err != nil {
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	req.Header.Set("api-token", apiKey)
-	req.Header.Set("X-Forwarded-Client-Cert", "dummy_cert")
+	// req.Header.Set("X-Forwarded-Client-Cert", "dummy_cert")
 
 	resp, err := client.Do(req)
 	if err != nil {
