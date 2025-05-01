@@ -26,6 +26,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not read server cert: %v", err)
 	}
+	log.Printf("server cert: %s", serverCert.Leaf.Subject.String())
+	log.Printf("server cert dns names: %s", serverCert.Leaf.DNSNames)
+	log.Printf("server cert email addresses: %s", serverCert.Leaf.EmailAddresses)
+	log.Printf("server cert URIs: %s", serverCert.Leaf.URIs)
+	log.Printf("server cert IP addresses: %s", serverCert.Leaf.IPAddresses)
 
 	caBytes, err := os.ReadFile("../certs/ca_chain.crt")
 	if err != nil {
@@ -190,7 +195,7 @@ func main() {
 
 func parseForwardedCert(xfccHeader string) (*x509.Certificate, error) {
 	xfccParts := strings.Split(xfccHeader, ",")
-	firstXfcc := xfccParts[len(xfccParts)- 1]
+	firstXfcc := xfccParts[len(xfccParts)-1]
 	parts := strings.Split(firstXfcc, ";")
 
 	var certPEM string

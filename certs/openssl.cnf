@@ -58,3 +58,5 @@ subjectAltName = @alt_names
 DNS.1 = localhost
 DNS.2 = api.idea-lifestyle.net
 IP.1 = 127.0.0.1
+email.1 = hello@idea-lifestyle.net
+URI.1 = https://api.idea-lifestyle.net
