@@ -15,3 +15,5 @@ stdout
 .DS_Store
 
 /certs_copy
+
+*/.claude

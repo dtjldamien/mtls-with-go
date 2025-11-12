@@ -40,7 +40,7 @@ static_resources:
                 trust_chain_verification: ACCEPT_UNTRUSTED
               tls_certificates:
               - certificate_chain:
-                  filename: "../certs/envoy.crt"
+                  filename: "../certs/envoy.pem"
                 private_key:
                   filename: "../certs/envoy.key"
 
@@ -65,6 +65,6 @@ static_resources:
         common_tls_context:
           tls_certificates:
           - certificate_chain:
-              filename: "../certs/envoy.crt"
+              filename: "../certs/envoy.pem"
             private_key:
               filename: "../certs/envoy.key"

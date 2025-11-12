@@ -13,14 +13,14 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	client, err := setupClient()
 	if err != nil {
 		log.Fatalf("could not setup client: %s\n", err)
-	}
-
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
 	}
 	endpointUrl := os.Getenv("ENDPOINT_URL")
 	apiKey := os.Getenv("API_KEY")
@@ -31,7 +31,6 @@ func main() {
 	}
 
 	req.Header.Set("api-token", apiKey)
-	// req.Header.Set("X-Forwarded-Client-Cert", "dummy_cert")
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -44,30 +43,26 @@ func main() {
 }
 
 func setupClient() (*http.Client, error) {
-	clientCert, err := tls.LoadX509KeyPair("../certs/valid_client_one.crt", "../certs/valid_client_one.key")
+	clientCertPath := os.Getenv("CLIENT_CERT_PATH")
+	clientKeyPath := os.Getenv("CLIENT_KEY_PATH")
+	caCertPath := os.Getenv("CA_CERT_PATH")
 
-	// read client cert
-	log.Printf("client cert: %s", clientCert.Leaf.Subject.String())
+	clientCert, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
+	if err != nil {
+		return nil, err
+	}
 
-	// clientCert, err := tls.LoadX509KeyPair("../certs/wrong_cn_client.crt", "../certs/wrong_cn_client.key")
-	// clientCert, err := tls.LoadX509KeyPair("../certs/valid_client_two.crt", "../certs/valid_client_two.key")
-	// clientCert, err := tls.LoadX509KeyPair("../certs/revoked_client_one.crt", "../certs/revoked_client_one.key")
-	// clientCert, err := tls.LoadX509KeyPair("../certs/revoked_client_two.crt", "../certs/revoked_client_two.key")
-	// clientCert, err := tls.LoadX509KeyPair("../certs/rogue_client.crt", "../certs/rogue_client.key")
-
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	caCert, err := os.ReadFile("../certs/ca_chain.crt")
+	caCert, err := os.ReadFile(caCertPath)
 	if err != nil {
 		return nil, err
 	}
 
 	caCertPool := x509.NewCertPool()
 	if !caCertPool.AppendCertsFromPEM(caCert) {
-		log.Fatalf("could not append CA certificate")
+		log.Fatalf("could not append CA certificate bundle")
 	}
+
+	log.Printf("loaded CA certificate bundle with multiple CAs")
 
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{clientCert},
